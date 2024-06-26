@@ -138,8 +138,7 @@ public class KUsbNfc extends CordovaPlugin {
         mManager = (UsbManager) this.cordova.getActivity().getSystemService(Context.USB_SERVICE);
 
         // Register receiver for USB permission
-        mPermissionIntent = PendingIntent.getBroadcast(this.cordova.getActivity(), 0, new Intent(ACTION_USB_PERMISSION), 0);
-
+        mPermissionIntent = PendingIntent.getBroadcast(this.cordova.getActivity(), 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_MUTABLE);
     }
 
     @Override
