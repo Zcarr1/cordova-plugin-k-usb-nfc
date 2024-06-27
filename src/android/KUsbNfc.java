@@ -121,8 +121,11 @@ public class KUsbNfc extends CordovaPlugin {
     {
         @Override
         public void inserted() {
-            BuildCardInfoParams params = new BuildCardInfoParams();
-            new BuildCardInfoTask().execute(params);
+            //BuildCardInfoParams params = new BuildCardInfoParams();
+            //new BuildCardInfoTask().execute(params);
+            
+            BuildCardInfoParams paramsData = new BuildCardInfoParams();
+            new BuildCardDataTask().execute(paramsData);
         }
 
         @Override
@@ -263,7 +266,54 @@ public class KUsbNfc extends CordovaPlugin {
         } catch (JSONException e) {
             sendExceptionCallback(e.toString(), true);
         }
+    }
 
+    void buildAndSentCardData(byte[] data, String tagType) {
+        
+
+        byte responseCode = data[data.length - 1];
+        byte[] data4byte = Arrays.copyOf(data, 4);
+
+        JSONObject resObj = new JSONObject();
+        try {
+
+            if (responseCode == (byte) 0x90) {
+                // success
+
+                String ndefMessage = "";
+
+                for (byte b : data) {
+                    String st = String.format("%02X", b);
+                    ndefMessage += st;
+                }
+
+                JSONObject tagInfo = new JSONObject();
+                tagInfo.put("ndefMessage", ndefMessage);
+
+                sendCallback(resObj, PluginResult.Status.OK, true);
+            } else if (responseCode == (byte) 0x63) {
+                // Error
+                // resObj.put("type", RES_TYPE_ERROR);
+                // resObj.put("message", "The operation failed.");
+                // sendCallback(resObj, PluginResult.Status.ERROR, true);
+            } else if (responseCode == (byte) 0x81) {
+                // Error
+                resObj.put("type", RES_TYPE_ERROR);
+                if (data.length >= 2 && data[data.length - 2] == (byte) 0x6A) {
+                    resObj.put("message", "Function not supported.");
+                } else {
+                    resObj.put("message", RES_ERROR);
+                }
+                sendCallback(resObj, PluginResult.Status.ERROR, true);
+            } else {
+                resObj.put("type", RES_TYPE_ERROR);
+                resObj.put("message", RES_ERROR);
+                sendCallback(resObj, PluginResult.Status.ERROR, true);
+            }
+
+        } catch (JSONException e) {
+            sendExceptionCallback(e.toString(), true);
+        }
     }
 
     private class OpenTask extends AsyncTask<UsbDevice, Void, Exception> {
@@ -349,7 +399,7 @@ public class KUsbNfc extends CordovaPlugin {
                     sendCallback(resObj, PluginResult.Status.ERROR, isKeepCallBack);
                 } else {
                     resObj.put("type", RES_TYPE_DEVICE_CONNECTION_CLOSED);
-                    resObj.put("message", "Connection closed successful ");
+                    resObj.put("message", "Connection closed successfully");
                     sendCallback(resObj, PluginResult.Status.OK, isKeepCallBack);
                 }
 
@@ -376,6 +426,36 @@ public class KUsbNfc extends CordovaPlugin {
 
                 byte[] trimmed = trimByteArray(recvBuffer);
                 buildAndSentCardInfo(trimmed, identifyTagType(atr));
+
+            } catch (IOException e) {
+                Log.d(":: KRISH ::", e.toString());
+            }
+
+            return null;
+        }
+    }
+
+    private class BuildCardDataTask extends AsyncTask<BuildCardInfoParams, Void, Void> {
+
+        @Override
+        protected Void doInBackground(BuildCardInfoParams... params) {
+
+            try {
+                byte[] sendBuffer = {
+                    (byte) 0x00, // CLA (Class of instruction)
+                    (byte) 0xA4, // INS (Instruction)
+                    (byte) 0x04, // P1 (Parameter 1)
+                    (byte) 0x00, // P2 (Parameter 2)
+                    (byte) 0x07, // Length of AID
+                    (byte) 0xD2, (byte) 0x76, (byte) 0x00, (byte) 0x00, (byte) 0x85, (byte) 0x01, (byte) 0x01, // AID (Application Identifier)
+                    (byte) 0x00  // Le (Maximum number of bytes expected in response)
+                };
+
+                byte[] atr = cardReader.powerOn();
+                byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
+
+                byte[] trimmed = trimByteArray(recvBuffer);
+                buildAndSentCardData(trimmed, identifyTagType(atr));
 
             } catch (IOException e) {
                 Log.d(":: KRISH ::", e.toString());
