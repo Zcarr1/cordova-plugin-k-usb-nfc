@@ -280,7 +280,8 @@ public class KUsbNfc extends CordovaPlugin {
             if (responseCode == (byte) 0x90) {
                 // success
 
-                String ndefMessage = new String(data, StandardCharsets.UTF_8);
+                byte[] aTagData = Arrays.copyOf(byteArray, 16);
+                String ndefMessage = new String(aTagData, StandardCharsets.UTF_8);
 
                 JSONObject tagInfo = new JSONObject();
                 tagInfo.put("ndefMessage", ndefMessage);
