@@ -28,6 +28,8 @@ import java.util.Arrays;
 
 import in.co.indusnet.cordova.plugins.nfc.usb.CCID;
 import in.co.indusnet.cordova.plugins.nfc.usb.CardCallback;
+import netscape.javascript.JSException;
+import netscape.javascript.JSObject;
 
 /**
  * KUsbNfc android Created by Krishnendu Sekhar Das
@@ -270,8 +272,6 @@ public class KUsbNfc extends CordovaPlugin {
     }
 
     void buildAndSentCardData(byte[] data, String tagType) {
-        
-
         byte responseCode = data[data.length - 1];
 
         JSONObject resObj = new JSONObject();
@@ -279,12 +279,23 @@ public class KUsbNfc extends CordovaPlugin {
 
             if (responseCode == (byte) 0x90) {
                 // success
+                byte[] aTagData = Arrays.copyOf(data, data.length - 1);
+                byte[] aNdefMessage = Arrays.copyOfRange(aTagData, 4, aTagData.length);
 
-                byte[] aTagData = Arrays.copyOf(data, 16);
-                String ndefMessage = new String(aTagData, StandardCharsets.UTF_8);
+                byte[] aLang = Arrays.copyOfRange(aNdefMessage, 1, 2);
+                String sLang = new String(aLang, StandardCharsets.UTF_8);
+
+                byte[] aText = Arrays.copyOfRange(aNdefMessage, 3, aNdefMessage.length);
+                String sText = new String(aText, StandardCharsets.UTF_8);
+
+                JSONObject ndefMessage = new JSONObject();
+                ndefMessage.put("lang", sLang);
+                ndefMessage.put("text", sText);
 
                 JSONObject tagData = new JSONObject();
                 tagData.put("ndefMessage", ndefMessage);
+                tagData.put("tagType", tagType);
+                
                 resObj.put("tagData", tagData);
                 
                 sendCallback(resObj, PluginResult.Status.OK, true);
@@ -438,13 +449,21 @@ public class KUsbNfc extends CordovaPlugin {
         protected Void doInBackground(BuildCardInfoParams... params) {
 
             try {
+                byte[] atr = cardReader.powerOn();
+                String tagType = identifyTagType(atr);
+                
                 byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x10 };
 
-                byte[] atr = cardReader.powerOn();
+                if (tagType == MIFARE_CLASSIC_1K || tagType == MIFARE_CLASSIC_4K) {
+                    byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x10 };
+                } else if (tagType == MIFARE_ULTRALIGHT) {
+                    byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x04 };
+                }
+
                 byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
 
                 byte[] trimmed = trimByteArray(recvBuffer);
-                buildAndSentCardData(trimmed, identifyTagType(atr));
+                buildAndSentCardData(trimmed, tagType);
 
             } catch (IOException e) {
                 Log.d(":: KRISH ::", e.toString());
