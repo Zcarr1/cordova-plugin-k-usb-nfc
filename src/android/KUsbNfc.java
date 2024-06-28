@@ -294,7 +294,7 @@ public class KUsbNfc extends CordovaPlugin {
                 JSONObject tagData = new JSONObject();
                 tagData.put("ndefMessage", ndefMessage);
                 
-                resObj.put("type", TAG_DATA);
+                resObj.put("type", RES_TYPE_TAG_DATA);
                 resObj.put("message", "The operation completed successfully");
                 resObj.put("tagData", tagData);
                 
