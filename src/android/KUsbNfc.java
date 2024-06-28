@@ -292,9 +292,9 @@ public class KUsbNfc extends CordovaPlugin {
 
                 JSONObject tagData = new JSONObject();
                 tagData.put("ndefMessage", ndefMessage);
-                tagData.put("tagType", tagType);
                 
                 resObj.put("tagData", tagData);
+                resObj.put("tagType", tagType);
                 
                 sendCallback(resObj, PluginResult.Status.OK, true);
             } else if (responseCode == (byte) 0x63) {
