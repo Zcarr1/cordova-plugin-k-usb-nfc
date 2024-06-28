@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import in.co.indusnet.cordova.plugins.nfc.usb.CCID;
@@ -272,7 +273,6 @@ public class KUsbNfc extends CordovaPlugin {
         
 
         byte responseCode = data[data.length - 1];
-        byte[] data4byte = Arrays.copyOf(data, 4);
 
         JSONObject resObj = new JSONObject();
         try {
@@ -280,12 +280,7 @@ public class KUsbNfc extends CordovaPlugin {
             if (responseCode == (byte) 0x90) {
                 // success
 
-                String ndefMessage = "";
-
-                for (byte b : data) {
-                    String st = String.format("%02X", b);
-                    ndefMessage += st;
-                }
+                String ndefMessage = new String(data, StandardCharsets.UTF_8);
 
                 JSONObject tagInfo = new JSONObject();
                 tagInfo.put("ndefMessage", ndefMessage);
@@ -441,15 +436,7 @@ public class KUsbNfc extends CordovaPlugin {
         protected Void doInBackground(BuildCardInfoParams... params) {
 
             try {
-                byte[] sendBuffer = {
-                    (byte) 0x00, // CLA (Class of instruction)
-                    (byte) 0xA4, // INS (Instruction)
-                    (byte) 0x04, // P1 (Parameter 1)
-                    (byte) 0x00, // P2 (Parameter 2)
-                    (byte) 0x07, // Length of AID
-                    (byte) 0xD2, (byte) 0x76, (byte) 0x00, (byte) 0x00, (byte) 0x85, (byte) 0x01, (byte) 0x01, // AID (Application Identifier)
-                    (byte) 0x00  // Le (Maximum number of bytes expected in response)
-                };
+                byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x10 };
 
                 byte[] atr = cardReader.powerOn();
                 byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
