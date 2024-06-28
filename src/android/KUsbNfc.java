@@ -28,8 +28,6 @@ import java.util.Arrays;
 
 import in.co.indusnet.cordova.plugins.nfc.usb.CCID;
 import in.co.indusnet.cordova.plugins.nfc.usb.CardCallback;
-import netscape.javascript.JSException;
-import netscape.javascript.JSObject;
 
 /**
  * KUsbNfc android Created by Krishnendu Sekhar Das
