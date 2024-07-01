@@ -11,6 +11,7 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -143,7 +144,7 @@ public class KUsbNfc extends CordovaPlugin {
         mManager = (UsbManager) this.cordova.getActivity().getSystemService(Context.USB_SERVICE);
 
         // Register receiver for USB permission
-        mPermissionIntent = PendingIntent.getBroadcast(this.cordova.getActivity(), 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_MUTABLE);
+        mPermissionIntent = PendingIntent.getBroadcast(this.cordova.getActivity(), 0, new Intent(ACTION_USB_PERMISSION), 0);
     }
 
     @Override
@@ -181,6 +182,8 @@ public class KUsbNfc extends CordovaPlugin {
                 resObj.put("message", "No USB device attached with this phone");
                 sendCallback(resObj, PluginResult.Status.ERROR, false);
             } catch (JSONException e) {
+                sendExceptionCallback(e.toString(), false);
+            } catch (Exception e) {
                 sendExceptionCallback(e.toString(), false);
             }
         }
@@ -267,6 +270,8 @@ public class KUsbNfc extends CordovaPlugin {
 
         } catch (JSONException e) {
             sendExceptionCallback(e.toString(), true);
+        } catch (Exception e) {
+            sendExceptionCallback(e.toString(), true);
         }
     }
 
@@ -281,14 +286,14 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] aTagData = Arrays.copyOf(data, data.length - 1);
                 byte[] aNdefMessage = Arrays.copyOfRange(aTagData, 4, aTagData.length);
 
-                byte[] aLang = Arrays.copyOfRange(aNdefMessage, 1, 2);
-                String sLang = new String(aLang, StandardCharsets.UTF_8);
+                //byte[] aLang = Arrays.copyOfRange(aNdefMessage, 1, 2);
+                //String sLang = new String(aLang, StandardCharsets.UTF_8);
 
                 byte[] aText = Arrays.copyOfRange(aNdefMessage, 3, aNdefMessage.length);
                 String sText = new String(aText, StandardCharsets.UTF_8);
 
                 JSONObject ndefMessage = new JSONObject();
-                ndefMessage.put("lang", sLang);
+                ndefMessage.put("lang", "en");
                 ndefMessage.put("text", sText);
 
                 JSONObject tagData = new JSONObject();
@@ -320,6 +325,8 @@ public class KUsbNfc extends CordovaPlugin {
             }
 
         } catch (JSONException e) {
+            sendExceptionCallback(e.toString(), true);
+        } catch (Exception e) {
             sendExceptionCallback(e.toString(), true);
         }
     }
@@ -454,9 +461,9 @@ public class KUsbNfc extends CordovaPlugin {
                 
                 byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x10 };
                 
-                if (tagType == MIFARE_ULTRALIGHT) {
+                /*if (tagType == MIFARE_ULTRALIGHT) {
                     sendBuffer[4] = (byte) 0x04;
-                }
+                }*/
 
                 byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
 
@@ -464,6 +471,10 @@ public class KUsbNfc extends CordovaPlugin {
                 buildAndSentCardData(trimmed, tagType);
 
             } catch (IOException e) {
+                Toast.makeText(this.cordova.getActivity(), e.toString(), Toast.LENGTH_LONG).show();
+                Log.d(":: KRISH ::", e.toString());
+            } catch (Exception e) {
+                Toast.makeText(this.cordova.getActivity(), e.toString(), Toast.LENGTH_LONG).show();
                 Log.d(":: KRISH ::", e.toString());
             }
 
