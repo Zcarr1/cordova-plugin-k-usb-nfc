@@ -127,8 +127,8 @@ public class KUsbNfc extends CordovaPlugin {
             BuildCardInfoParams params = new BuildCardInfoParams();
             new BuildCardInfoTask().execute(params);
             
-            BuildCardInfoParams paramsData = new BuildCardInfoParams();
-            new BuildCardDataTask().execute(paramsData);
+            //BuildCardInfoParams paramsData = new BuildCardInfoParams();
+            //new BuildCardDataTask().execute(paramsData);
         }
 
         @Override
@@ -434,7 +434,7 @@ public class KUsbNfc extends CordovaPlugin {
         protected Void doInBackground(BuildCardInfoParams... params) {
 
             try {
-                byte[] sendBuffer = { (byte) 0xFF, (byte) 0xCA, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
+                byte[] sendBuffer = { (byte) 0xFF, (byte) 0xCA, (byte) 0x00, (byte) 0x00, (byte) 0x10 };
 
                 byte[] atr = cardReader.powerOn();
                 byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
