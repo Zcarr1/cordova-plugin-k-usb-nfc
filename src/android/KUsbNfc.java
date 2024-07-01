@@ -451,6 +451,7 @@ public class KUsbNfc extends CordovaPlugin {
                 String tagType = identifyTagType(atr);
                 
                 byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x10 };
+                
                 if (tagType == MIFARE_ULTRALIGHT) {
                     sendBuffer[4] = (byte) 0x04;
                 }
