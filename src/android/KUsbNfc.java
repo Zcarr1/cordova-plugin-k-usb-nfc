@@ -471,10 +471,10 @@ public class KUsbNfc extends CordovaPlugin {
                 buildAndSentCardData(trimmed, tagType);
 
             } catch (IOException e) {
-                Toast.makeText(this.cordova.getActivity(), e.toString(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(this.cordova.getActivity(), e.toString(), Toast.LENGTH_LONG).show();
                 Log.d(":: KRISH ::", e.toString());
             } catch (Exception e) {
-                Toast.makeText(this.cordova.getActivity(), e.toString(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(this.cordova.getActivity(), e.toString(), Toast.LENGTH_LONG).show();
                 Log.d(":: KRISH ::", e.toString());
             }
 
