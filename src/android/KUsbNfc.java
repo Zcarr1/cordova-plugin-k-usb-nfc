@@ -51,6 +51,7 @@ public class KUsbNfc extends CordovaPlugin {
     private static final String RES_TYPE_DEVICE_CONNECTION_CLOSED = "DEVICE_CONNECTION_CLOSED";
     private static final String RES_TYPE_DEVICE_CONNECTION_ERROR = "DEVICE_CONNECTION_ERROR";
     private static final String RES_TYPE_TAG_INFO = "TAG_INFO";
+    private static final String RES_TYPE_TAG_DATA = "TAG_DATA";
     private static final String RES_TYPE_ERROR = "ERROR";
     private static final String RES_ERROR = "Error!!, please try again";
 
@@ -292,8 +293,9 @@ public class KUsbNfc extends CordovaPlugin {
 
                 JSONObject tagData = new JSONObject();
                 tagData.put("ndefMessage", ndefMessage);
-                tagData.put("tagType", tagType);
                 
+                resObj.put("type", RES_TYPE_TAG_DATA);
+                resObj.put("message", "The operation completed successfully");
                 resObj.put("tagData", tagData);
                 
                 sendCallback(resObj, PluginResult.Status.OK, true);
