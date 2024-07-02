@@ -286,7 +286,7 @@ public class CCID implements Closeable {
         if (count < 0) {
             throw new IOException("Failed to send data to the CCID reader");
         }
-//        Log.v(TAG, String.format("Sent %d bytes to BULK-OUT: %s", count, Hex.toHexString(req, 0, count)));
+        // Log.v(TAG, String.format("Sent %d bytes to BULK-OUT: %s", count, Hex.toHexString(req, 0, count)));
 
         SlotStatus status;
         byte[] rsp = new byte[271];
@@ -295,15 +295,17 @@ public class CCID implements Closeable {
             if (count < 0) {
                 throw new IOException("Failed to read data from the CCID reader");
             }
-//            Log.v(TAG, String.format("Read %d bytes from BULK-IN: %s", count, Hex.toHexString(rsp, 0, count)));
+        // Log.v(TAG, String.format("Read %d bytes from BULK-IN: %s", count, Hex.toHexString(rsp, 0, count)));
             status = validateResponse(rsp, rtn);
         } while (waitIcc && status != SlotStatus.Active);
 
         Response retVal = new Response();
         retVal.param = rsp[9];
         if (count > 10) {
-            retVal.data = new byte[count-10];
-            System.arraycopy(rsp, 10, retVal.data, 0, count-10);
+            //retVal.data = new byte[count-10];
+            //System.arraycopy(rsp, 10, retVal.data, 0, count-10);
+            retVal.data = new byte[count];
+            System.arraycopy(rsp, 0, retVal.data, 0, count);
         } else {
             retVal.data = new byte[0];
         }

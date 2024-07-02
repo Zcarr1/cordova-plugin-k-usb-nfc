@@ -124,11 +124,11 @@ public class KUsbNfc extends CordovaPlugin {
     {
         @Override
         public void inserted() {
-            BuildCardInfoParams params = new BuildCardInfoParams();
-            new BuildCardInfoTask().execute(params);
+            //BuildCardInfoParams params = new BuildCardInfoParams();
+            //new BuildCardInfoTask().execute(params);
             
-            //BuildCardInfoParams paramsData = new BuildCardInfoParams();
-            //new BuildCardDataTask().execute(paramsData);
+            BuildCardInfoParams paramsData = new BuildCardInfoParams();
+            new BuildCardDataTask().execute(paramsData);
         }
 
         @Override
@@ -285,15 +285,16 @@ public class KUsbNfc extends CordovaPlugin {
                 // success
                 byte[] aTagData = Arrays.copyOf(data, data.length - 1);
                 byte[] aNdefMessage = Arrays.copyOfRange(aTagData, 4, aTagData.length);
+                byte[] aRaw = Arrays.copyOfRange(aNdefMessage, 3, aNdefMessage.length);
 
-                //byte[] aLang = Arrays.copyOfRange(aNdefMessage, 1, 2);
-                //String sLang = new String(aLang, StandardCharsets.UTF_8);
+                byte[] aLang = Arrays.copyOfRange(aRaw, 0, 1);
+                String sLang = new String(aLang, StandardCharsets.UTF_8);
 
-                byte[] aText = Arrays.copyOfRange(aNdefMessage, 3, aNdefMessage.length);
+                byte[] aText = Arrays.copyOfRange(aRaw, 2, aRaw.length);
                 String sText = new String(aText, StandardCharsets.UTF_8);
 
                 JSONObject ndefMessage = new JSONObject();
-                ndefMessage.put("lang", "en");
+                ndefMessage.put("lang", sLang);
                 ndefMessage.put("text", sText);
 
                 JSONObject tagData = new JSONObject();
