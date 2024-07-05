@@ -124,11 +124,11 @@ public class KUsbNfc extends CordovaPlugin {
     {
         @Override
         public void inserted() {
-            //BuildCardInfoParams params = new BuildCardInfoParams();
-            //new BuildCardInfoTask().execute(params);
+            BuildCardInfoParams params = new BuildCardInfoParams();
+            new BuildCardInfoTask().execute(params);
             
-            BuildCardInfoParams paramsData = new BuildCardInfoParams();
-            new BuildCardDataTask().execute(paramsData);
+            ///BuildCardInfoParams paramsData = new BuildCardInfoParams();
+            //new BuildCardDataTask().execute(paramsData);
         }
 
         @Override
@@ -144,7 +144,7 @@ public class KUsbNfc extends CordovaPlugin {
         mManager = (UsbManager) this.cordova.getActivity().getSystemService(Context.USB_SERVICE);
 
         // Register receiver for USB permission
-        mPermissionIntent = PendingIntent.getBroadcast(this.cordova.getActivity(), 0, new Intent(ACTION_USB_PERMISSION), 0);
+        mPermissionIntent = PendingIntent.getBroadcast(this.cordova.getActivity(), 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_MUTABLE);
     }
 
     @Override

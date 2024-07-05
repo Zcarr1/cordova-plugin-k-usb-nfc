@@ -302,10 +302,10 @@ public class CCID implements Closeable {
         Response retVal = new Response();
         retVal.param = rsp[9];
         if (count > 10) {
-            //retVal.data = new byte[count-10];
-            //System.arraycopy(rsp, 10, retVal.data, 0, count-10);
-            retVal.data = new byte[count];
-            System.arraycopy(rsp, 0, retVal.data, 0, count);
+            retVal.data = new byte[count-10];
+            System.arraycopy(rsp, 10, retVal.data, 0, count-10);
+            //retVal.data = new byte[count];
+            //System.arraycopy(rsp, 0, retVal.data, 0, count);
         } else {
             retVal.data = new byte[0];
         }
