@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -301,12 +302,12 @@ public class CCID implements Closeable {
 
         Response retVal = new Response();
         retVal.param = rsp[9];
+
+        Log.d(":: RSP ::", new String(rsp, StandardCharsets.UTF_8));
+
         if (count > 10) {
-            //retVal.data = new byte[count-10];
-            //System.arraycopy(rsp, 10, retVal.data, 0, count-10);
-            
-            retVal.data = new byte[count];
-            System.arraycopy(rsp, 0, retVal.data, 0, count);
+            retVal.data = new byte[count-10];
+            System.arraycopy(rsp, 10, retVal.data, 0, count-10);
         } else {
             retVal.data = new byte[0];
         }
