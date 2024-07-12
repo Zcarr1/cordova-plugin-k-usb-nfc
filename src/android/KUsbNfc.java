@@ -435,7 +435,7 @@ public class KUsbNfc extends CordovaPlugin {
         protected Void doInBackground(BuildCardInfoParams... params) {
 
             try {
-                byte[] sendBuffer = { (byte) 0xFF, (byte) 0xCA, (byte) 0x00, (byte) 0x00, (byte) 0x10 };
+                byte[] sendBuffer = { (byte) 0xFF, (byte) 0xCA, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
 
                 byte[] atr = cardReader.powerOn();
                 byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
@@ -460,11 +460,11 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] atr = cardReader.powerOn();
                 String tagType = identifyTagType(atr);
                 
-                byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x00 };
+                byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x10 };
                 
-                /*if (tagType == MIFARE_ULTRALIGHT) {
+                if (tagType == MIFARE_ULTRALIGHT) {
                     sendBuffer[4] = (byte) 0x04;
-                }*/
+                }
 
                 byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
 
