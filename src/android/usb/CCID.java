@@ -280,8 +280,7 @@ public class CCID implements Closeable {
         req[8] = 0x00; //Not used (Xfr: Param (short APDU))
         req[9] = 0x00; //Not used (Xfr: Param, continued (short APDU))
         if (data != null)
-            //System.arraycopy(data, 0, req, 10, data.length);
-            System.arraycopy(data, 0, req, 0, data.length);
+            System.arraycopy(data, 0, req, 10, data.length);
 
         int count;
 
