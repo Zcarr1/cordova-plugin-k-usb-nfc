@@ -291,7 +291,7 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] aNdefMessage = Arrays.copyOfRange(aTagData, 4, aTagData.length);
                 byte[] aRaw = Arrays.copyOfRange(aNdefMessage, 3, aNdefMessage.length);
 
-                byte[] aLang = Arrays.copyOfRange(aRaw, 0, 1);
+                byte[] aLang = Arrays.copyOfRange(aRaw, 0, 2);
                 String sLang = new String(aLang, StandardCharsets.UTF_8);
 
                 byte[] aText = Arrays.copyOfRange(aRaw, 2, aRaw.length);
