@@ -269,7 +269,8 @@ public class CCID implements Closeable {
         sequence = (sequence + 1) % 0xFF;
         byte[] req = new byte[(data == null ? 0 : data.length) + 10];
         req[0] = cmd;
-        req[1] = (byte) (req.length - 10); //(data) length
+        //req[1] = (byte) (req.length - 10); //(data) length
+        req[1] = (byte) (req.length); //(data) length
         req[2] = 0x00; //length, continued (we don't support long lenghts)
         req[3] = 0x00; //length, continued (we don't support long lenghts)
         req[4] = 0x00; //length, continued (we don't support long lenghts)
