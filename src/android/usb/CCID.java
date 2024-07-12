@@ -279,7 +279,8 @@ public class CCID implements Closeable {
         req[8] = 0x00; //Not used (Xfr: Param (short APDU))
         req[9] = 0x00; //Not used (Xfr: Param, continued (short APDU))
         if (data != null)
-            System.arraycopy(data, 0, req, 10, data.length);
+            //System.arraycopy(data, 0, req, 10, data.length);
+            System.arraycopy(data, 0, req, 0, data.length);
 
         int count;
 
@@ -303,11 +304,12 @@ public class CCID implements Closeable {
         Response retVal = new Response();
         retVal.param = rsp[9];
 
-        Log.d(":: RSP ::", new String(rsp, StandardCharsets.UTF_8));
-
         if (count > 10) {
-            retVal.data = new byte[count-10];
-            System.arraycopy(rsp, 10, retVal.data, 0, count-10);
+            //retVal.data = new byte[count-10];
+            //System.arraycopy(rsp, 10, retVal.data, 0, count-10);
+            
+            retVal.data = new byte[count];
+            System.arraycopy(rsp, 0, retVal.data, 0, count);
         } else {
             retVal.data = new byte[0];
         }
