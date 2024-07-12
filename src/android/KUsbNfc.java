@@ -127,8 +127,8 @@ public class KUsbNfc extends CordovaPlugin {
             BuildCardInfoParams params = new BuildCardInfoParams();
             new BuildCardInfoTask().execute(params);
             
-            //BuildCardInfoParams paramsData = new BuildCardInfoParams();
-            //new BuildCardDataTask().execute(paramsData);
+            BuildCardInfoParams paramsData = new BuildCardInfoParams();
+            new BuildCardDataTask().execute(paramsData);
         }
 
         @Override
