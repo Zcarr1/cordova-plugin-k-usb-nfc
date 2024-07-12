@@ -124,8 +124,8 @@ public class KUsbNfc extends CordovaPlugin {
     {
         @Override
         public void inserted() {
-            BuildCardInfoParams params = new BuildCardInfoParams();
-            new BuildCardInfoTask().execute(params);
+            //BuildCardInfoParams params = new BuildCardInfoParams();
+            //new BuildCardInfoTask().execute(params);
             
             BuildCardInfoParams paramsData = new BuildCardInfoParams();
             new BuildCardDataTask().execute(paramsData);
@@ -284,6 +284,10 @@ public class KUsbNfc extends CordovaPlugin {
             if (responseCode == (byte) 0x90) {
                 // success
                 byte[] aTagData = Arrays.copyOf(data, data.length - 1);
+
+                String sTagData = new String(aTagData, StandardCharsets.UTF_8);
+                Log.d(":: TAGDATA ::", sTagData);
+
                 byte[] aNdefMessage = Arrays.copyOfRange(aTagData, 4, aTagData.length);
                 byte[] aRaw = Arrays.copyOfRange(aNdefMessage, 3, aNdefMessage.length);
 
@@ -463,14 +467,13 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x10 };
                 
                 if (tagType == MIFARE_ULTRALIGHT) {
-                    sendBuffer[4] = (byte) 0x04;
+                    sendBuffer[sendBuffer.length - 1] = (byte) 0x04;
                 }
-
+                
                 byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
 
                 byte[] trimmed = trimByteArray(recvBuffer);
                 buildAndSentCardData(trimmed, tagType);
-
             } catch (IOException e) {
                 //Toast.makeText(this.cordova.getActivity(), e.toString(), Toast.LENGTH_LONG).show();
                 Log.d(":: KRISH ::", e.toString());
