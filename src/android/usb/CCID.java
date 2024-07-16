@@ -299,7 +299,8 @@ public class CCID implements Closeable {
             status = validateResponse(rsp, rtn);
         } while (waitIcc && status != SlotStatus.Active);
         
-        Log.d(TAG, new String(rsp, StandardCharsets.UTF_8));
+        String strRsp = new String(rsp, StandardCharsets.UTF_8);
+        Log.d(TAG, strRsp);
 
         Response retVal = new Response();
         retVal.param = rsp[9];

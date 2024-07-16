@@ -466,6 +466,7 @@ public class KUsbNfc extends CordovaPlugin {
                 String tagType = identifyTagType(atr);
                 
                 //byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x10 };
+                
                 byte[] sendBuffer = { (byte) 0x0A, (byte) 0xF2, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
                 
                 byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
