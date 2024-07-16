@@ -267,10 +267,11 @@ public class CCID implements Closeable {
 
     public Response transmit(byte cmd, byte[] data, byte rtn, boolean waitIcc) throws IOException {
         sequence = (sequence + 1) % 0xFF;
-        byte[] req = new byte[(data == null ? 0 : data.length) + 10];
+        //byte[] req = new byte[(data == null ? 0 : data.length) + 10];
+        byte[] req = new byte[(data == null ? 0 : data.length) + 271];
         req[0] = cmd;
         //req[1] = (byte) (req.length - 10); //(data) length
-        req[1] = (byte) (req.length); //(data) length
+        req[1] = (byte) (req.length - 271); //(data) length
         req[2] = 0x00; //length, continued (we don't support long lenghts)
         req[3] = 0x00; //length, continued (we don't support long lenghts)
         req[4] = 0x00; //length, continued (we don't support long lenghts)
@@ -297,7 +298,7 @@ public class CCID implements Closeable {
             if (count < 0) {
                 throw new IOException("Failed to read data from the CCID reader");
             }
-//            Log.v(TAG, String.format("Read %d bytes from BULK-IN: %s", count, Hex.toHexString(rsp, 0, count)));
+            // Log.v(TAG, String.format("Read %d bytes from BULK-IN: %s", count, Hex.toHexString(rsp, 0, count)));
             status = validateResponse(rsp, rtn);
         } while (waitIcc && status != SlotStatus.Active);
 
