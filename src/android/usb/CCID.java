@@ -298,7 +298,7 @@ public class CCID implements Closeable {
 //            Log.v(TAG, String.format("Read %d bytes from BULK-IN: %s", count, Hex.toHexString(rsp, 0, count)));
             status = validateResponse(rsp, rtn);
         } while (waitIcc && status != SlotStatus.Active);
-
+        
         Log.d(TAG, new String(rsp, StandardCharsets.UTF_8));
 
         Response retVal = new Response();
