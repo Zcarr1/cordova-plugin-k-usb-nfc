@@ -267,11 +267,9 @@ public class CCID implements Closeable {
 
     public Response transmit(byte cmd, byte[] data, byte rtn, boolean waitIcc) throws IOException {
         sequence = (sequence + 1) % 0xFF;
-        //byte[] req = new byte[(data == null ? 0 : data.length) + 10];
-        byte[] req = new byte[(data == null ? 0 : data.length) + 271];
+        byte[] req = new byte[(data == null ? 0 : data.length) + 10];
         req[0] = cmd;
-        //req[1] = (byte) (req.length - 10); //(data) length
-        req[1] = (byte) (req.length - 271); //(data) length
+        req[1] = (byte) (req.length - 10); //(data) length
         req[2] = 0x00; //length, continued (we don't support long lenghts)
         req[3] = 0x00; //length, continued (we don't support long lenghts)
         req[4] = 0x00; //length, continued (we don't support long lenghts)
