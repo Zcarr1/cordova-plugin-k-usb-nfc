@@ -17,6 +17,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import java.nio.charset.StandardCharsets;
+
 import in.co.indusnet.cordova.plugins.nfc.diagnostic.CCIDDescriptor;
 
 public class CCID implements Closeable {
@@ -299,8 +301,7 @@ public class CCID implements Closeable {
             status = validateResponse(rsp, rtn);
         } while (waitIcc && status != SlotStatus.Active);
         
-        String strRsp = new String(rsp, StandardCharsets.UTF_8);
-        Log.d(TAG, strRsp);
+        Log.d(TAG, new String(rsp, StandardCharsets.UTF_8));
 
         Response retVal = new Response();
         retVal.param = rsp[9];
