@@ -127,8 +127,8 @@ public class KUsbNfc extends CordovaPlugin {
             BuildCardInfoParams params = new BuildCardInfoParams();
             new BuildCardInfoTask().execute(params);
             
-            //BuildCardInfoParams paramsData = new BuildCardInfoParams();
-            //new BuildCardDataTask().execute(paramsData);
+            BuildCardInfoParams paramsData = new BuildCardInfoParams();
+            new BuildCardDataTask().execute(paramsData);
         }
 
         @Override
@@ -432,6 +432,7 @@ public class KUsbNfc extends CordovaPlugin {
     private class BuildCardInfoParams {
         public int slotNum;
     }
+    
 
     private class BuildCardInfoTask extends AsyncTask<BuildCardInfoParams, Void, Void> {
 
@@ -464,17 +465,15 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] atr = cardReader.powerOn();
                 String tagType = identifyTagType(atr);
                 
-                byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x10 };
+                byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB1, (byte) 0x00, (byte) 0x04, (byte) 0x08 };
                 
                 byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
 
                 byte[] trimmed = trimByteArray(recvBuffer);
                 buildAndSentCardData(trimmed, tagType);
             } catch (IOException e) {
-                //Toast.makeText(this.cordova.getActivity(), e.toString(), Toast.LENGTH_LONG).show();
                 Log.d(":: KRISH ::", e.toString());
             } catch (Exception e) {
-                //Toast.makeText(this.cordova.getActivity(), e.toString(), Toast.LENGTH_LONG).show();
                 Log.d(":: KRISH ::", e.toString());
             }
 
