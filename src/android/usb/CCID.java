@@ -10,7 +10,6 @@ import android.util.Log;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -296,19 +295,15 @@ public class CCID implements Closeable {
             if (count < 0) {
                 throw new IOException("Failed to read data from the CCID reader");
             }
-            // Log.v(TAG, String.format("Read %d bytes from BULK-IN: %s", count, Hex.toHexString(rsp, 0, count)));
+//            Log.v(TAG, String.format("Read %d bytes from BULK-IN: %s", count, Hex.toHexString(rsp, 0, count)));
             status = validateResponse(rsp, rtn);
         } while (waitIcc && status != SlotStatus.Active);
 
         Response retVal = new Response();
         retVal.param = rsp[9];
-
         if (count > 10) {
-            //retVal.data = new byte[count-10];
-            //System.arraycopy(rsp, 10, retVal.data, 0, count-10);
-            
-            retVal.data = new byte[count];
-            System.arraycopy(rsp, 0, retVal.data, 0, count);
+            retVal.data = new byte[count-10];
+            System.arraycopy(rsp, 10, retVal.data, 0, count-10);
         } else {
             retVal.data = new byte[0];
         }
