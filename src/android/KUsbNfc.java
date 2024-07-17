@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import javax.smartcardio.CommandAPDU;
+import javax.smartcardio.ResponseAPDU;
+
 import in.co.indusnet.cordova.plugins.nfc.usb.CCID;
 import in.co.indusnet.cordova.plugins.nfc.usb.CardCallback;
 
@@ -489,28 +492,28 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] sizeData = cardReader.transmitApdu(getSizeCmd);
                 int ndefLength = ((sizeData[0] & 0xFF) << 8) | (sizeData[1] & 0xFF);
 
-                 // Buffer per raccogliere i dati letti
-                byte[] buffer = new byte[ndefLength];
-                int offset = 0;
-                
-                for (int block = 0; block < ndefLength; block++) {
-                    byte[] sendBuffer = new byte[] {
-                        (byte) 0xFF, // CLA (proprietaria)
-                        (byte) 0xB0, // INS (Read Binary)
-                        (byte) 0x00, // P1 (parametro alto, indirizzo del blocco)
-                        (byte) block, // P2 (parametro basso, indirizzo del blocco)
-                        (byte) 0x04  // Le (lunghezza da leggere, 4 byte per blocco)
-                    };
+                Log.d("TAG_SIZE", ndefLength.toString());
 
-                    byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
+                 // Buffer per raccogliere i dati letti
+                byte[] ndefMessageBytes = new byte[ndefLength];
+                
+                int offset = 0;
+                int blockSize = 4;
+                
+                while (offset < ndefLength) {
+                    int length = Math.min(blockSize, ndefLength - offset);
+                    byte[] readNdefCommand = { (byte)0x00, (byte)0xB0, (byte)(offset >> 8), (byte)(offset & 0xFF), (byte)length };
+                    CommandAPDU readCommandBlock = new CommandAPDU(readNdefCommand);
+                    ResponseAPDU readResponse = channel.transmit(readCommandBlock);
                     
-                    System.arraycopy(recvBuffer, 0, buffer, offset, recvBuffer.length);
-                    offset += recvBuffer.length;
+                    // Copia i dati nel buffer
+                    System.arraycopy(readResponse.getData(), 0, ndefMessageBytes, offset, length);
+                    offset += length;
                 }
 
-                byte[] trimmed = trimByteArray(buffer);
+                //byte[] trimmed = trimByteArray(buffer);
 
-                buildAndSentCardData(trimmed, tagType);
+                buildAndSentCardData(ndefMessageBytes, tagType);
             } catch (IOException e) {
                 Log.d(":: KRISH ::", e.toString());
             } catch (Exception e) {
