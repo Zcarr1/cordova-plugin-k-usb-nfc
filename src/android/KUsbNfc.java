@@ -12,6 +12,8 @@ import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -285,21 +287,35 @@ public class KUsbNfc extends CordovaPlugin {
                 // success
                 byte[] aTagData = Arrays.copyOf(data, data.length - 1);
 
-                String sTagData = new String(aTagData, StandardCharsets.UTF_8);
-                Log.d(":: TAGDATA ::", sTagData);
+                NdefMessage ndefMessage = new NdefMessage(aTagData);
+                
+                NdefRecord[] records = ndefMessage.getRecords();
 
-                byte[] aNdefMessage = Arrays.copyOfRange(aTagData, 4, aTagData.length);
-                byte[] aRaw = Arrays.copyOfRange(aNdefMessage, 3, aNdefMessage.length);
+                byte[] payload = records[0].getPayload();
 
-                byte[] aLang = Arrays.copyOfRange(aRaw, 0, 2);
-                String sLang = new String(aLang, StandardCharsets.UTF_8);
+                String encoding = (payload[0] & 0x80) == 0 ? "UTF-8" : "UTF-16";
 
-                byte[] aText = Arrays.copyOfRange(aRaw, 2, aRaw.length);
-                String sText = new String(aText, StandardCharsets.UTF_8);
+                int languageCodeLength = payload[0] & 0x3F;
+
+                String languageCode = new String(payload, 1, languageCodeLength, StandardCharsets.US_ASCII);
+
+                String text = new String(payload, 1 + languageCodeLength, payload.length - 1 - languageCodeLength, encoding);
+
+                //String sTagData = new String(aTagData, StandardCharsets.UTF_8);
+                //Log.d(":: TAGDATA ::", sTagData);
+
+                //byte[] aNdefMessage = Arrays.copyOfRange(aTagData, 4, aTagData.length);
+                //byte[] aRaw = Arrays.copyOfRange(aNdefMessage, 3, aNdefMessage.length);
+
+                //byte[] aLang = Arrays.copyOfRange(aRaw, 0, 2);
+                //String sLang = new String(aLang, StandardCharsets.UTF_8);
+
+                //byte[] aText = Arrays.copyOfRange(aRaw, 2, aRaw.length);
+                //String sText = new String(aText, StandardCharsets.UTF_8);
 
                 JSONObject ndefMessage = new JSONObject();
-                ndefMessage.put("lang", sLang);
-                ndefMessage.put("text", sText);
+                ndefMessage.put("lang", languageCode);
+                ndefMessage.put("text", text);
 
                 JSONObject tagData = new JSONObject();
                 tagData.put("ndefMessage", ndefMessage);
@@ -478,13 +494,17 @@ public class KUsbNfc extends CordovaPlugin {
                     };
 
                     byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
+                    int recvLen = recvBuffer.length - 1;
+
+                    if (recvLen == 19) {
+                        recvLen = recvBuffer.length;
+                    }
                     
-                    System.arraycopy(recvBuffer, 0, buffer, (block - 4) * 16, recvBuffer.length);
+                    System.arraycopy(recvBuffer, 0, buffer, offset, recvLen);
+                    offset += recvLen;
                 }
 
                 byte[] trimmed = trimByteArray(buffer);
-
-                Log.d(":: TAG_DATA ::", new String(buffer).trim());
 
                 buildAndSentCardData(trimmed, tagType);
             } catch (IOException e) {
