@@ -479,9 +479,14 @@ public class KUsbNfc extends CordovaPlugin {
                     };
 
                     byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
+                    int recvLen = recvBuffer.length - 2;
+
+                    if (block == 19) {
+                        recvLen = recvBuffer.length;
+                    }
                     
-                    System.arraycopy(recvBuffer, 0, buffer, offset, recvBuffer.length - 1);
-                    offset += recvBuffer.length - 1;
+                    System.arraycopy(recvBuffer, 0, buffer, offset, recvLen);
+                    offset += recvLen;
                 }
 
                 byte[] trimmed = trimByteArray(buffer);
