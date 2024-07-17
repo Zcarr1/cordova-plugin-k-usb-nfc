@@ -466,7 +466,7 @@ public class KUsbNfc extends CordovaPlugin {
                 String tagType = identifyTagType(atr);
 
                  // Buffer per raccogliere i dati letti
-                byte[] buffer = new byte[64];
+                byte[] buffer = new byte[271];
                 int offset = 0;
                 
                 for (int block = 4; block < 20; block++) {
