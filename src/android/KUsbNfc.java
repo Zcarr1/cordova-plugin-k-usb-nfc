@@ -485,26 +485,24 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] atr = cardReader.powerOn();
                 String tagType = identifyTagType(atr);
 
-                byte[] getSizeCmd = { (byte)0x00, (byte)0xB0, (byte)0x00, (byte)0x00, (byte)0x02 };
-                byte[] sizeData = cardReader.transmitApdu(getSizeCmd);
-                int ndefLength = ((sizeData[0] & 0xFF) << 8) | (sizeData[1] & 0xFF);
+                //byte[] getSizeCmd = { (byte)0x00, (byte)0xB0, (byte)0x00, (byte)0x00, (byte)0x02 };
+                //byte[] sizeData = cardReader.transmitApdu(getSizeCmd);
+                //int ndefLength = ((sizeData[0] & 0xFF) << 8) | (sizeData[1] & 0xFF);
 
-                Log.d("TAG_SIZE", String.valueOf(ndefLength));
+                int ndefLength = 271;
 
                  // Buffer per raccogliere i dati letti
                 byte[] ndefMessageBytes = new byte[ndefLength];
                 
                 int offset = 0;
-                int blockSize = 4;
-                
-                while (offset < ndefLength) {
-                    int length = Math.min(blockSize, ndefLength - offset);
-                    byte[] readNdefCommand = { (byte)0x00, (byte)0xB0, (byte)(offset >> 8), (byte)(offset & 0xFF), (byte)length };
+                int startBlock = 4;
+
+                for (int block = startBlock; block < ndefLength; block++) {
+                    byte[] readNdefCommand = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) 0x04 };
                     byte[] readNdefResp = cardReader.transmitApdu(readNdefCommand);
-                    
-                    // Copia i dati nel buffer
-                    System.arraycopy(readNdefResp, 0, ndefMessageBytes, offset, length);
-                    offset += length;
+
+                    System.arraycopy(readNdefResp, 0, ndefMessageBytes, offset, readNdefResp.length);
+                    offset += readNdefResp.length;
                 }
 
                 //byte[] trimmed = trimByteArray(buffer);
