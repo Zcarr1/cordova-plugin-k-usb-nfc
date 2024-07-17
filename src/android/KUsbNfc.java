@@ -29,9 +29,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import javax.smartcardio.CommandAPDU;
-import javax.smartcardio.ResponseAPDU;
-
 import in.co.indusnet.cordova.plugins.nfc.usb.CCID;
 import in.co.indusnet.cordova.plugins.nfc.usb.CardCallback;
 
@@ -503,11 +500,10 @@ public class KUsbNfc extends CordovaPlugin {
                 while (offset < ndefLength) {
                     int length = Math.min(blockSize, ndefLength - offset);
                     byte[] readNdefCommand = { (byte)0x00, (byte)0xB0, (byte)(offset >> 8), (byte)(offset & 0xFF), (byte)length };
-                    CommandAPDU readCommandBlock = new CommandAPDU(readNdefCommand);
-                    ResponseAPDU readResponse = channel.transmit(readCommandBlock);
+                    byte[] readNdefResp = cardReader.transmitApdu(readNdefCommand);
                     
                     // Copia i dati nel buffer
-                    System.arraycopy(readResponse.getData(), 0, ndefMessageBytes, offset, length);
+                    System.arraycopy(readNdefResp, 0, ndefMessageBytes, offset, length);
                     offset += length;
                 }
 
