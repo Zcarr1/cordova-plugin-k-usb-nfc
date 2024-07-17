@@ -313,12 +313,12 @@ public class KUsbNfc extends CordovaPlugin {
                 //byte[] aText = Arrays.copyOfRange(aRaw, 2, aRaw.length);
                 //String sText = new String(aText, StandardCharsets.UTF_8);
 
-                JSONObject ndefMessage = new JSONObject();
-                ndefMessage.put("lang", languageCode);
-                ndefMessage.put("text", text);
+                JSONObject jsNdefMessage = new JSONObject();
+                jsNdefMessage.put("lang", languageCode);
+                jsNdefMessage.put("text", text);
 
                 JSONObject tagData = new JSONObject();
-                tagData.put("ndefMessage", ndefMessage);
+                tagData.put("ndefMessage", jsNdefMessage);
                 
                 resObj.put("type", RES_TYPE_TAG_DATA);
                 resObj.put("message", "The operation completed successfully");
