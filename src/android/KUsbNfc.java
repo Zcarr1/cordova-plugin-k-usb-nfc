@@ -287,9 +287,13 @@ public class KUsbNfc extends CordovaPlugin {
                 // success
                 byte[] aTagData = Arrays.copyOf(data, data.length - 1);
 
-                NdefMessage ndefMessage = new NdefMessage(aTagData);
+                NdefMessage ndefMessage = new NdefMessage(data);
+
+                Log.d("#1", "Ndef message");
                 
                 NdefRecord[] records = ndefMessage.getRecords();
+
+                Log.d("#2", "Ndef records");
 
                 byte[] payload = records[0].getPayload();
 
@@ -481,11 +485,15 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] atr = cardReader.powerOn();
                 String tagType = identifyTagType(atr);
 
+                byte[] getSizeCmd = { (byte)0x00, (byte)0xB0, (byte)0x00, (byte)0x00, (byte)0x02 };
+                byte[] sizeData = cardReader.transmitApdu(getSizeCmd);
+                int ndefLength = ((sizeData[0] & 0xFF) << 8) | (sizeData[1] & 0xFF);
+
                  // Buffer per raccogliere i dati letti
-                byte[] buffer = new byte[271];
+                byte[] buffer = new byte[ndefLength];
                 int offset = 0;
                 
-                for (int block = 4; block < 20; block++) {
+                for (int block = 0; block < ndefLength; block++) {
                     byte[] sendBuffer = new byte[] {
                         (byte) 0xFF, // CLA (proprietaria)
                         (byte) 0xB0, // INS (Read Binary)
@@ -495,14 +503,9 @@ public class KUsbNfc extends CordovaPlugin {
                     };
 
                     byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
-                    int recvLen = recvBuffer.length - 1;
-
-                    if (recvLen == 19) {
-                        recvLen = recvBuffer.length;
-                    }
                     
-                    System.arraycopy(recvBuffer, 0, buffer, offset, recvLen);
-                    offset += recvLen;
+                    System.arraycopy(recvBuffer, 0, buffer, offset, recvBuffer.length);
+                    offset += recvBuffer.length;
                 }
 
                 byte[] trimmed = trimByteArray(buffer);
