@@ -485,6 +485,9 @@ public class KUsbNfc extends CordovaPlugin {
                 }
 
                 byte[] trimmed = trimByteArray(buffer);
+
+                Log.d(":: TAG_DATA ::", new String(trimmed, StandardCharsets.UTF_8));
+
                 buildAndSentCardData(trimmed, tagType);
             } catch (IOException e) {
                 Log.d(":: KRISH ::", e.toString());
