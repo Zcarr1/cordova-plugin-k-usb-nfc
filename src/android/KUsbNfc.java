@@ -464,14 +464,27 @@ public class KUsbNfc extends CordovaPlugin {
             try {
                 byte[] atr = cardReader.powerOn();
                 String tagType = identifyTagType(atr);
-                
-                byte[] sendBuffer = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) 0x04, (byte) 0x10 };
-                
-                //byte[] sendBuffer = { (byte) 0x0A, (byte) 0xF2, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
-                
-                byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
 
-                byte[] trimmed = trimByteArray(recvBuffer);
+                 // Buffer per raccogliere i dati letti
+                byte[] buffer = new byte[271];
+                int offset = 0;
+                
+                for (int block = 4; block < 20; block++) {
+                    byte[] sendBuffer = new byte[] {
+                        (byte) 0xFF, // CLA (proprietaria)
+                        (byte) 0xB0, // INS (Read Binary)
+                        (byte) 0x00, // P1 (parametro alto, indirizzo del blocco)
+                        (byte) block, // P2 (parametro basso, indirizzo del blocco)
+                        (byte) 0x04  // Le (lunghezza da leggere, 4 byte per blocco)
+                    };
+
+                    byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
+
+                    System.arraycopy(recvBuffer, 0, buffer, offset, recvBuffer.length);
+                    offset += data.length;
+                }
+
+                byte[] trimmed = trimByteArray(buffer);
                 buildAndSentCardData(trimmed, tagType);
             } catch (IOException e) {
                 Log.d(":: KRISH ::", e.toString());
