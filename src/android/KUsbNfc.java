@@ -467,7 +467,6 @@ public class KUsbNfc extends CordovaPlugin {
 
                  // Buffer per raccogliere i dati letti
                 byte[] buffer = new byte[271];
-                int offset = 0;
                 
                 for (int block = 4; block < 20; block++) {
                     byte[] sendBuffer = new byte[] {
@@ -479,14 +478,8 @@ public class KUsbNfc extends CordovaPlugin {
                     };
 
                     byte[] recvBuffer = cardReader.transmitApdu(sendBuffer);
-                    int recvLen = recvBuffer.length - 2;
-
-                    if (block == 19) {
-                        recvLen = recvBuffer.length;
-                    }
                     
-                    System.arraycopy(recvBuffer, 0, buffer, offset, recvLen);
-                    offset += recvLen;
+                    System.arraycopy(recvBuffer, 0, buffer, (block - 4) * 16, recvBuffer.length);
                 }
 
                 byte[] trimmed = trimByteArray(buffer);
