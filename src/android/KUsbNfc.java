@@ -294,7 +294,7 @@ public class KUsbNfc extends CordovaPlugin {
                 for (int i = 8; i < aTagData.length; i++) {
                     byte el = aTagData[i];
 
-                    if (el != (byte) 0x90 || el != (byte) 0xFE) {
+                    if (el != (byte) 0x90 && el != (byte) 0xFE) {
                         if (i == 8) {
                             aLangCode[0] = el;
                         } else if (i == 10) {
