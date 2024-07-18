@@ -489,16 +489,14 @@ public class KUsbNfc extends CordovaPlugin {
                 //byte[] sizeData = cardReader.transmitApdu(getSizeCmd);
                 //int ndefLength = ((sizeData[0] & 0xFF) << 8) | (sizeData[1] & 0xFF);
 
-                int ndefLength = 271;
-                
-                byte[] ndefMessageBytes = new byte[ndefLength];
+                byte[] ndefMessageBytes = new byte[100];
                 
                 int offset = 0;
                 int startBlock = 4;
-                int endBlock = 64;
+                int endBlock = 20;
 
                 for (int block = startBlock; block < endBlock; block++) {
-                    byte[] readNdefCommand = { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) 0x04 };
+                    byte[] readNdefCommand =  new byte[] { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) 0x04 };
                     byte[] readNdefResp = cardReader.transmitApdu(readNdefCommand);
 
                     System.arraycopy(readNdefResp, 0, ndefMessageBytes, offset, readNdefResp.length);
