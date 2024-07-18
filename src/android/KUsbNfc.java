@@ -507,7 +507,7 @@ public class KUsbNfc extends CordovaPlugin {
 
                 byte[] trimmed = trimByteArray(ndefMessageBytes);
 
-                Log.d(":: TRIM_DATA ::", new String(trimmed, StandardCharsets.UTF_8));
+                Log.d(":: TRIM_DATA ::", new String(ndefMessageBytes, StandardCharsets.UTF_8));
 
                 buildAndSentCardData(trimmed, tagType);
             } catch (IOException e) {
