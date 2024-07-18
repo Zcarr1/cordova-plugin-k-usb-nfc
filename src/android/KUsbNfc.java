@@ -494,9 +494,15 @@ public class KUsbNfc extends CordovaPlugin {
                 int offset = 0;
                 int startBlock = 4;
                 int endBlock = 20;
+                int length = 10;
+
+                if (tagType == "MIFARE_ULTRALIGHT") {
+                    length = 4;
+                    Log.d(":: TAG_TYPE ::", "The tag type is MIFARE_ULTRALIGHT");
+                }
 
                 for (int block = startBlock; block < endBlock; block++) {
-                    byte[] readNdefCommand =  new byte[] { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) 0x04 };
+                    byte[] readNdefCommand =  new byte[] { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) length };
                     byte[] readNdefResp = cardReader.transmitApdu(readNdefCommand);
 
                     System.arraycopy(readNdefResp, 0, ndefMessageBytes, offset, readNdefResp.length);
