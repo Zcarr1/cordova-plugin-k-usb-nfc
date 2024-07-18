@@ -294,6 +294,8 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] aLangCode = Arrays.copyOfRange(aTagData, 8, 9);
                 Strind sLangCode = new String(aLangCode, StandardCharsets.UTF_8);
 
+                String text = "";
+
                 Log.d(":: LANG_CODE ::", sLangCode);
 
                 JSONObject jsNdefMessage = new JSONObject();
