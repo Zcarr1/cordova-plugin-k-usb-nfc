@@ -498,7 +498,6 @@ public class KUsbNfc extends CordovaPlugin {
 
                 if (tagType == "MIFARE_ULTRALIGHT") {
                     length = 4;
-                    Log.d(":: TAG_TYPE ::", "The tag type is MIFARE_ULTRALIGHT");
                 }
 
                 for (int block = startBlock; block < endBlock; block++) {
@@ -515,7 +514,7 @@ public class KUsbNfc extends CordovaPlugin {
 
                 Log.d(":: TRIM_DATA ::", new String(trimmed, StandardCharsets.UTF_8));
 
-                buildAndSentCardData(ndefMessageBytes, tagType);
+                buildAndSentCardData(trimmed, tagType);
             } catch (IOException e) {
                 Log.d(":: KRISH ::", e.toString());
             } catch (Exception e) {
