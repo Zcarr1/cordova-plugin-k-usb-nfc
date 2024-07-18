@@ -287,38 +287,17 @@ public class KUsbNfc extends CordovaPlugin {
                 // success
                 byte[] aTagData = Arrays.copyOf(data, data.length - 1);
 
-                NdefMessage ndefMessage = new NdefMessage(data);
+                for (int i = 0; i < aTagData.length; i++) {
+                    
+                }
 
-                Log.d("#1", "Ndef message");
-                
-                NdefRecord[] records = ndefMessage.getRecords();
+                byte[] aLangCode = Arrays.copyOfRange(aTagData, 8, 9);
+                Strind sLangCode = new String(aLangCode, StandardCharsets.UTF_8);
 
-                Log.d("#2", "Ndef records");
-
-                byte[] payload = records[0].getPayload();
-
-                String encoding = (payload[0] & 0x80) == 0 ? "UTF-8" : "UTF-16";
-
-                int languageCodeLength = payload[0] & 0x3F;
-
-                String languageCode = new String(payload, 1, languageCodeLength, StandardCharsets.US_ASCII);
-
-                String text = new String(payload, 1 + languageCodeLength, payload.length - 1 - languageCodeLength, encoding);
-
-                //String sTagData = new String(aTagData, StandardCharsets.UTF_8);
-                //Log.d(":: TAGDATA ::", sTagData);
-
-                //byte[] aNdefMessage = Arrays.copyOfRange(aTagData, 4, aTagData.length);
-                //byte[] aRaw = Arrays.copyOfRange(aNdefMessage, 3, aNdefMessage.length);
-
-                //byte[] aLang = Arrays.copyOfRange(aRaw, 0, 2);
-                //String sLang = new String(aLang, StandardCharsets.UTF_8);
-
-                //byte[] aText = Arrays.copyOfRange(aRaw, 2, aRaw.length);
-                //String sText = new String(aText, StandardCharsets.UTF_8);
+                Log.d(":: LANG_CODE ::", sLangCode);
 
                 JSONObject jsNdefMessage = new JSONObject();
-                jsNdefMessage.put("lang", languageCode);
+                jsNdefMessage.put("lang", sLangCode);
                 jsNdefMessage.put("text", text);
 
                 JSONObject tagData = new JSONObject();
@@ -494,19 +473,20 @@ public class KUsbNfc extends CordovaPlugin {
                 int offset = 0;
                 int startBlock = 4;
                 int endBlock = 20;
-                int length = 10;
-
-                if (tagType == "MIFARE_ULTRALIGHT") {
-                    length = 4;
-                }
+                int length = 4;
 
                 for (int block = startBlock; block < endBlock; block++) {
                     byte[] readNdefCommand =  new byte[] { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) length };
                     byte[] readNdefResp = cardReader.transmitApdu(readNdefCommand);
                     byte[] trimNdefResp = trimByteArray(readNdefResp);
+                    int trimLen = trimNdefResp.length - 1;
                     
-                    System.arraycopy(trimNdefResp, 0, ndefMessageBytes, offset, trimNdefResp.length);
-                    offset += trimNdefResp.length;
+                    if (block == 19) {
+                        trimLen = trimNdefResp.length;
+                    }
+
+                    System.arraycopy(trimNdefResp, 0, ndefMessageBytes, offset, trimLen);
+                    offset += trimLen;
                 }
                 
                 Log.d(":: NO_TRIMMED_DATA ::", new String(ndefMessageBytes, StandardCharsets.UTF_8));
