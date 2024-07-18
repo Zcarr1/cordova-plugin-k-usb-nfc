@@ -490,8 +490,7 @@ public class KUsbNfc extends CordovaPlugin {
                 //int ndefLength = ((sizeData[0] & 0xFF) << 8) | (sizeData[1] & 0xFF);
 
                 int ndefLength = 271;
-
-                 // Buffer per raccogliere i dati letti
+                
                 byte[] ndefMessageBytes = new byte[ndefLength];
                 
                 int offset = 0;
@@ -505,10 +504,14 @@ public class KUsbNfc extends CordovaPlugin {
                     System.arraycopy(readNdefResp, 0, ndefMessageBytes, offset, readNdefResp.length);
                     offset += readNdefResp.length;
                 }
+                
+                Log.d(":: NO_TRIMMED_DATA ::", new String(ndefMessageBytes, StandardCharsets.UTF_8));
 
-                //byte[] trimmed = trimByteArray(buffer);
+                byte[] trimmed = trimByteArray(ndefMessageBytes);
 
-                buildAndSentCardData(ndefMessageBytes, tagType);
+                Log.d(":: TRIM_DATA ::", new String(trimmed, StandardCharsets.UTF_8));
+
+                buildAndSentCardData(trimmed, tagType);
             } catch (IOException e) {
                 Log.d(":: KRISH ::", e.toString());
             } catch (Exception e) {
