@@ -301,7 +301,7 @@ public class KUsbNfc extends CordovaPlugin {
                             aLangCode[1] = el;
                         } else {
                             if (el != (byte) 0x00) {
-                                Log.d("BYTES", String.format("%02X", el));
+                                //Log.d("BYTES", String.format("%02X", el));
                                 aText[offset] = el;
                                 offset++;
                             } else {
@@ -314,8 +314,8 @@ public class KUsbNfc extends CordovaPlugin {
                 String sLangCode = new String(trimByteArray(aLangCode), StandardCharsets.UTF_8);
                 String sText = new String(trimByteArray(aText), StandardCharsets.UTF_8);;
 
-                Log.d(":: LANG_CODE ::", sLangCode);
-                Log.d(":: TEXT ::", sText);
+                //Log.d(":: LANG_CODE ::", sLangCode);
+                //Log.d(":: TEXT ::", sText);
 
                 JSONObject jsNdefMessage = new JSONObject();
                 jsNdefMessage.put("lang", sLangCode);
@@ -488,16 +488,31 @@ public class KUsbNfc extends CordovaPlugin {
                 //byte[] getSizeCmd = { (byte)0x00, (byte)0xB0, (byte)0x00, (byte)0x00, (byte)0x02 };
                 //byte[] sizeData = cardReader.transmitApdu(getSizeCmd);
                 //int ndefLength = ((sizeData[0] & 0xFF) << 8) | (sizeData[1] & 0xFF);
-
-                byte[] ndefMessageBytes = new byte[100];
                 
                 int offset = 0;
                 int startBlock = 4;
                 int endBlock = 20;
-                int length = 4;
+                int blockLen = 4;
+                int ndefLength = 64;
+
+                if (tagType == "MIFARE_ULTRALIGHT") {
+                    endBlock = 20;
+                    blockLen = 4;
+                    ndefLength = 64;
+                } else if (tagType == "MIFARE_CLASSIC_1K") {
+                    endBlock = 64;
+                    blockLen = 16;
+                    ndefLength = 1024;
+                } else if (tagType == "MIFARE_CLASSIC_4K") {
+                    endBlock = 256;
+                    blockLen = 16;
+                    ndefLength = 4096;
+                }
+
+                byte[] ndefMessageBytes = new byte[ndefLength];
 
                 for (int block = startBlock; block < endBlock; block++) {
-                    byte[] readNdefCommand =  new byte[] { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) length };
+                    byte[] readNdefCommand =  new byte[] { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) blockLen };
                     byte[] readNdefResp = cardReader.transmitApdu(readNdefCommand);
                     byte[] trimNdefResp = trimByteArray(readNdefResp);
 
