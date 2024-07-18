@@ -286,21 +286,39 @@ public class KUsbNfc extends CordovaPlugin {
             if (responseCode == (byte) 0x90) {
                 // success
                 byte[] aTagData = Arrays.copyOf(data, data.length - 1);
+                byte[] aLangCode = new byte[2];
+                byte[] aText = new byte[128];
+                
+                int offset = 0;
 
-                for (int i = 0; i < aTagData.length; i++) {
-                    
+                for (int i = 9; i < aTagData.length; i++) {
+                    byte el = aTagData[i];
+
+                    if (el != (byte) 0x90) {
+                        if (i == 9) {
+                            aLangCode[0] = el;
+                        } else if (i == 10) {
+                            aLangCode[1] = el;
+                        } else {
+                            if (el != (byte) 0x00) {
+                                System.arraycopy(el, 0, aText, offset, 1);
+                                offset++;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
                 }
 
-                byte[] aLangCode = Arrays.copyOfRange(aTagData, 8, 9);
                 String sLangCode = new String(aLangCode, StandardCharsets.UTF_8);
-
-                String text = "";
+                String sText = new String(aText, StandardCharsets.UTF_8);;
 
                 Log.d(":: LANG_CODE ::", sLangCode);
+                Log.d(":: TEXT ::", sText);
 
                 JSONObject jsNdefMessage = new JSONObject();
                 jsNdefMessage.put("lang", sLangCode);
-                jsNdefMessage.put("text", text);
+                jsNdefMessage.put("text", sText);
 
                 JSONObject tagData = new JSONObject();
                 tagData.put("ndefMessage", jsNdefMessage);
@@ -481,14 +499,9 @@ public class KUsbNfc extends CordovaPlugin {
                     byte[] readNdefCommand =  new byte[] { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) length };
                     byte[] readNdefResp = cardReader.transmitApdu(readNdefCommand);
                     byte[] trimNdefResp = trimByteArray(readNdefResp);
-                    int trimLen = trimNdefResp.length - 1;
-                    
-                    if (block == 19) {
-                        trimLen = trimNdefResp.length;
-                    }
 
-                    System.arraycopy(trimNdefResp, 0, ndefMessageBytes, offset, trimLen);
-                    offset += trimLen;
+                    System.arraycopy(trimNdefResp, 0, ndefMessageBytes, offset, trimNdefResp.length);
+                    offset += trimNdefResp.length;
                 }
                 
                 Log.d(":: NO_TRIMMED_DATA ::", new String(ndefMessageBytes, StandardCharsets.UTF_8));
