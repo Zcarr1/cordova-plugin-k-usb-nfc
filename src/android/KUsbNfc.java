@@ -503,9 +503,10 @@ public class KUsbNfc extends CordovaPlugin {
                 for (int block = startBlock; block < endBlock; block++) {
                     byte[] readNdefCommand =  new byte[] { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) length };
                     byte[] readNdefResp = cardReader.transmitApdu(readNdefCommand);
-
-                    System.arraycopy(readNdefResp, 0, ndefMessageBytes, offset, readNdefResp.length);
-                    offset += readNdefResp.length;
+                    byte[] trimNdefResp = trimByteArray(readNdefResp);
+                    
+                    System.arraycopy(trimNdefResp, 0, ndefMessageBytes, offset, trimNdefResp.length);
+                    offset += trimNdefResp.length;
                 }
                 
                 Log.d(":: NO_TRIMMED_DATA ::", new String(ndefMessageBytes, StandardCharsets.UTF_8));
