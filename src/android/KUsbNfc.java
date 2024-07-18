@@ -493,7 +493,7 @@ public class KUsbNfc extends CordovaPlugin {
                 int startBlock = 4;
                 int endBlock = 20;
                 int blockLen = 4;
-                int ndefLength = 64;
+                int ndefLength = 144;
 
                 if (tagType == "MIFARE_ULTRALIGHT") {
                     endBlock = 20;
