@@ -300,7 +300,7 @@ public class KUsbNfc extends CordovaPlugin {
                         } else if (i == 10) {
                             aLangCode[1] = el;
                         } else {
-                            if (el != (byte) 0x00) {
+                            if (el != (byte) 0x00 || el != (byte) 0xFE) {
                                 Log.d("BYTES", String.format("%02X", el));
                                 aText[offset] = el;
                                 offset++;
