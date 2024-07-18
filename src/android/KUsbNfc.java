@@ -295,13 +295,13 @@ public class KUsbNfc extends CordovaPlugin {
                     byte el = aTagData[i];
 
                     if (el != (byte) 0x90) {
-                        if (i == 9) {
+                        if (i == 8) {
                             aLangCode[0] = el;
                         } else if (i == 10) {
                             aLangCode[1] = el;
                         } else {
                             if (el != (byte) 0x00) {
-                                System.arraycopy(el, 0, aText, offset, 1);
+                                System.arraycopy(aTagData, i, aText, offset, 1);
                                 offset++;
                             } else {
                                 break;
