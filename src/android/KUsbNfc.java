@@ -295,13 +295,12 @@ public class KUsbNfc extends CordovaPlugin {
                     byte el = aTagData[i];
 
                     if (el != (byte) 0x90) {
-                        if (i == 8) {
+                        if (i == 7) {
                             aLangCode[0] = el;
                         } else if (i == 10) {
                             aLangCode[1] = el;
                         } else {
                             if (el != (byte) 0x00) {
-                                //System.arraycopy(aTagData, i, aText, offset, 1);
                                 aText[offset] = el;
                                 offset++;
                             } else {
@@ -311,8 +310,8 @@ public class KUsbNfc extends CordovaPlugin {
                     }
                 }
 
-                String sLangCode = new String(aLangCode, StandardCharsets.UTF_8);
-                String sText = new String(aText, StandardCharsets.UTF_8);;
+                String sLangCode = new String(trimByteArray(aLangCode), StandardCharsets.UTF_8);
+                String sText = new String(trimByteArray(aText), StandardCharsets.UTF_8);;
 
                 Log.d(":: LANG_CODE ::", sLangCode);
                 Log.d(":: TEXT ::", sText);
