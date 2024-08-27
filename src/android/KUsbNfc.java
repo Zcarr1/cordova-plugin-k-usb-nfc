@@ -126,8 +126,8 @@ public class KUsbNfc extends CordovaPlugin {
     {
         @Override
         public void inserted() {
-            BuildCardInfoParams params = new BuildCardInfoParams();
-            new BuildCardInfoTask().execute(params);
+            //BuildCardInfoParams params = new BuildCardInfoParams();
+            //new BuildCardInfoTask().execute(params);
             
             BuildCardInfoParams paramsData = new BuildCardInfoParams();
             new BuildCardDataTask().execute(paramsData);
@@ -301,7 +301,6 @@ public class KUsbNfc extends CordovaPlugin {
                             aLangCode[1] = el;
                         } else {
                             if (el != (byte) 0x00) {
-                                //Log.d("BYTES", String.format("%02X", el));
                                 aText[offset] = el;
                                 offset++;
                             } else {
@@ -495,15 +494,15 @@ public class KUsbNfc extends CordovaPlugin {
                 int blockLen = 4;
                 int ndefLength = 144;
 
-                if (tagType == "MIFARE_ULTRALIGHT") {
+                if (tagType == MIFARE_ULTRALIGHT) {
                     endBlock = 20;
                     blockLen = 4;
                     ndefLength = 144;
-                } else if (tagType == "MIFARE_CLASSIC_1K") {
+                } else if (tagType == MIFARE_CLASSIC_1K) {
                     endBlock = 64;
                     blockLen = 16;
                     ndefLength = 1024;
-                } else if (tagType == "MIFARE_CLASSIC_4K") {
+                } else if (tagType == MIFARE_CLASSIC_4K) {
                     endBlock = 256;
                     blockLen = 16;
                     ndefLength = 4096;
@@ -520,11 +519,11 @@ public class KUsbNfc extends CordovaPlugin {
                     offset += trimNdefResp.length;
                 }
                 
-                Log.d(":: NO_TRIMMED_DATA ::", new String(ndefMessageBytes, StandardCharsets.UTF_8));
+                //Log.d(":: NO_TRIMMED_DATA ::", new String(ndefMessageBytes, StandardCharsets.UTF_8));
 
                 byte[] trimmed = trimByteArray(ndefMessageBytes);
 
-                Log.d(":: TRIM_DATA ::", new String(trimmed, StandardCharsets.UTF_8));
+                //Log.d(":: TRIM_DATA ::", new String(trimmed, StandardCharsets.UTF_8));
 
                 buildAndSentCardData(trimmed, tagType);
             } catch (IOException e) {
