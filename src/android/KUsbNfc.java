@@ -58,6 +58,8 @@ public class KUsbNfc extends CordovaPlugin {
     private static final String RES_TYPE_ERROR = "ERROR";
     private static final String RES_ERROR = "Error!!, please try again";
 
+    private static final String ACR122U = "ACR122U";
+
     private UsbManager mManager;
     private PendingIntent mPermissionIntent;
     private UsbDevice device = null;
@@ -196,7 +198,7 @@ public class KUsbNfc extends CordovaPlugin {
         for (UsbDevice device : mManager.getDeviceList().values()) {
             String productName = device.getProductName();
             if (productName != null) {
-                if (productName.contains("ACR122U")) {
+                if (productName.contains(ACR122U)) {
                     mManager.requestPermission(device, mPermissionIntent);
                 }
             }
