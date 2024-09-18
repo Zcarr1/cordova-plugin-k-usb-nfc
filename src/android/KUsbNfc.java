@@ -122,13 +122,12 @@ public class KUsbNfc extends CordovaPlugin {
         }
     };
 
-    private class CardReaderCallback implements CardCallback
-    {
+    private class CardReaderCallback implements CardCallback {
         @Override
         public void inserted() {
-            //BuildCardInfoParams params = new BuildCardInfoParams();
-            //new BuildCardInfoTask().execute(params);
-            
+            // BuildCardInfoParams params = new BuildCardInfoParams();
+            // new BuildCardInfoTask().execute(params);
+
             BuildCardInfoParams paramsData = new BuildCardInfoParams();
             new BuildCardDataTask().execute(paramsData);
         }
@@ -146,7 +145,8 @@ public class KUsbNfc extends CordovaPlugin {
         mManager = (UsbManager) this.cordova.getActivity().getSystemService(Context.USB_SERVICE);
 
         // Register receiver for USB permission
-        mPermissionIntent = PendingIntent.getBroadcast(this.cordova.getActivity(), 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_MUTABLE);
+        mPermissionIntent = PendingIntent.getBroadcast(this.cordova.getActivity(), 0, new Intent(ACTION_USB_PERMISSION),
+                PendingIntent.FLAG_MUTABLE);
     }
 
     @Override
@@ -194,7 +194,12 @@ public class KUsbNfc extends CordovaPlugin {
 
     private void initConnection() {
         for (UsbDevice device : mManager.getDeviceList().values()) {
-            mManager.requestPermission(device, mPermissionIntent);
+            String productName = device.getProductName();
+            if (productName != null) {
+                if (productName.contains("ACR122U")) {
+                    mManager.requestPermission(device, mPermissionIntent);
+                }
+            }
         }
     }
 
@@ -288,7 +293,7 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] aTagData = Arrays.copyOf(data, data.length - 1);
                 byte[] aLangCode = new byte[2];
                 byte[] aText = new byte[128];
-                
+
                 int offset = 0;
 
                 for (int i = 8; i < aTagData.length; i++) {
@@ -311,10 +316,11 @@ public class KUsbNfc extends CordovaPlugin {
                 }
 
                 String sLangCode = new String(trimByteArray(aLangCode), StandardCharsets.UTF_8);
-                String sText = new String(trimByteArray(aText), StandardCharsets.UTF_8);;
+                String sText = new String(trimByteArray(aText), StandardCharsets.UTF_8);
+                ;
 
-                //Log.d(":: LANG_CODE ::", sLangCode);
-                //Log.d(":: TEXT ::", sText);
+                // Log.d(":: LANG_CODE ::", sLangCode);
+                // Log.d(":: TEXT ::", sText);
 
                 JSONObject jsNdefMessage = new JSONObject();
                 jsNdefMessage.put("lang", sLangCode);
@@ -322,11 +328,11 @@ public class KUsbNfc extends CordovaPlugin {
 
                 JSONObject tagData = new JSONObject();
                 tagData.put("ndefMessage", jsNdefMessage);
-                
+
                 resObj.put("type", RES_TYPE_TAG_DATA);
                 resObj.put("message", "The operation completed successfully");
                 resObj.put("tagData", tagData);
-                
+
                 sendCallback(resObj, PluginResult.Status.OK, true);
             } else if (responseCode == (byte) 0x63) {
                 // Error
@@ -388,7 +394,7 @@ public class KUsbNfc extends CordovaPlugin {
                     deviceInfo.put("location", device.getDeviceName());
                     deviceInfo.put("class", device.getDeviceClass());
                     deviceInfo.put("vendorId", device.getVendorId());
-                    deviceInfo.put("productId",device.getProductId());
+                    deviceInfo.put("productId", device.getProductId());
 
                     resObj.put("type", RES_TYPE_DEVICE_CONNECTION_OPENED);
                     resObj.put("message", "Connection is successful with " + device.getProductName());
@@ -417,7 +423,7 @@ public class KUsbNfc extends CordovaPlugin {
 
             Exception result = null;
             try {
-                if(cardReader != null && cardReader.isOpen()) {
+                if (cardReader != null && cardReader.isOpen()) {
                     cardReader.close();
                 }
 
@@ -451,7 +457,6 @@ public class KUsbNfc extends CordovaPlugin {
     private class BuildCardInfoParams {
         public int slotNum;
     }
-    
 
     private class BuildCardInfoTask extends AsyncTask<BuildCardInfoParams, Void, Void> {
 
@@ -484,10 +489,11 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] atr = cardReader.powerOn();
                 String tagType = identifyTagType(atr);
 
-                //byte[] getSizeCmd = { (byte)0x00, (byte)0xB0, (byte)0x00, (byte)0x00, (byte)0x02 };
-                //byte[] sizeData = cardReader.transmitApdu(getSizeCmd);
-                //int ndefLength = ((sizeData[0] & 0xFF) << 8) | (sizeData[1] & 0xFF);
-                
+                // byte[] getSizeCmd = { (byte)0x00, (byte)0xB0, (byte)0x00, (byte)0x00,
+                // (byte)0x02 };
+                // byte[] sizeData = cardReader.transmitApdu(getSizeCmd);
+                // int ndefLength = ((sizeData[0] & 0xFF) << 8) | (sizeData[1] & 0xFF);
+
                 int offset = 0;
                 int startBlock = 4;
                 int endBlock = 20;
@@ -511,19 +517,21 @@ public class KUsbNfc extends CordovaPlugin {
                 byte[] ndefMessageBytes = new byte[ndefLength];
 
                 for (int block = startBlock; block < endBlock; block++) {
-                    byte[] readNdefCommand =  new byte[] { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block, (byte) blockLen };
+                    byte[] readNdefCommand = new byte[] { (byte) 0xFF, (byte) 0xB0, (byte) 0x00, (byte) block,
+                            (byte) blockLen };
                     byte[] readNdefResp = cardReader.transmitApdu(readNdefCommand);
                     byte[] trimNdefResp = trimByteArray(readNdefResp);
 
                     System.arraycopy(trimNdefResp, 0, ndefMessageBytes, offset, trimNdefResp.length);
                     offset += trimNdefResp.length;
                 }
-                
-                //Log.d(":: NO_TRIMMED_DATA ::", new String(ndefMessageBytes, StandardCharsets.UTF_8));
+
+                // Log.d(":: NO_TRIMMED_DATA ::", new String(ndefMessageBytes,
+                // StandardCharsets.UTF_8));
 
                 byte[] trimmed = trimByteArray(ndefMessageBytes);
 
-                //Log.d(":: TRIM_DATA ::", new String(trimmed, StandardCharsets.UTF_8));
+                // Log.d(":: TRIM_DATA ::", new String(trimmed, StandardCharsets.UTF_8));
 
                 buildAndSentCardData(trimmed, tagType);
             } catch (IOException e) {
@@ -540,24 +548,24 @@ public class KUsbNfc extends CordovaPlugin {
         String tagType = UNKNOWN;
         if (bytes.length >= 11) {
             switch (((bytes[13] & 255) << 8) | (bytes[14] & 255)) {
-            case 1:
-                return MIFARE_CLASSIC_1K;
-            case 2:
-                return MIFARE_CLASSIC_4K;
-            case 3:
-                return MIFARE_ULTRALIGHT;
-            case 38:
-                return MIFARE_MINI;
-            case 61444:
-                return TOPAZ_JEWEL;
-            case 61457:
-                return FELICA_212K;
-            case 61458:
-                return FELICA_424K;
-            case 65344:
-                return NFCIP;
-            default:
-                return tagType;
+                case 1:
+                    return MIFARE_CLASSIC_1K;
+                case 2:
+                    return MIFARE_CLASSIC_4K;
+                case 3:
+                    return MIFARE_ULTRALIGHT;
+                case 38:
+                    return MIFARE_MINI;
+                case 61444:
+                    return TOPAZ_JEWEL;
+                case 61457:
+                    return FELICA_212K;
+                case 61458:
+                    return FELICA_424K;
+                case 65344:
+                    return NFCIP;
+                default:
+                    return tagType;
             }
         } else if (Arrays.equals(bytes,
                 new byte[] { (byte) 59, (byte) -127, Byte.MIN_VALUE, (byte) 1, Byte.MIN_VALUE, Byte.MIN_VALUE })) {
